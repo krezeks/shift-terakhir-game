@@ -116,6 +116,14 @@
     .replay-btn { margin-top:12px; text-align:center; justify-content:center; }
     .visually-hidden { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
     .site-foot { display:flex; justify-content:space-between; gap:12px; margin-top:16px; color:#68766f; font-size:9px; letter-spacing:.08em; text-transform:uppercase; }
+    .bubble.typing { display:flex; align-items:center; gap:4px; padding:13px 12px; }
+    .tdot { width:6px; height:6px; border-radius:50%; background:#9fb3a8; opacity:.35; animation:tblink 1.1s ease-in-out infinite; }
+    .tdot:nth-child(2) { animation-delay:.18s; }
+    .tdot:nth-child(3) { animation-delay:.36s; }
+    @keyframes tblink { 0%, 60%, 100% { opacity:.25; transform:translateY(0); } 30% { opacity:.95; transform:translateY(-2px); } }
+    .bubble.deleted { color:#8d9b94; background:rgba(255,255,255,.03); border-style:dashed; font-style:italic; }
+    .sound-btn { flex:none; width:31px; height:31px; display:grid; place-items:center; border:1px solid var(--line); border-radius:50%; color:#cfe0d2; background:rgba(255,255,255,.03); font-size:14px; line-height:1; cursor:pointer; }
+    .sound-btn.off { color:#77837c; text-decoration:line-through; opacity:.6; }
     @keyframes rise { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
     @media (min-width: 821px) and (max-height: 800px) {
       .page { padding:18px 0 15px; }
@@ -200,9 +208,10 @@
           <div class="group-icon" aria-hidden="true">OP</div>
           <div class="group-info">
             <div class="group-name">Tim Operasional · L12</div>
-            <div class="group-members">Dita, Bimo, Aji, kamu</div>
+            <div class="group-members" id="group-status">Dita, Bimo, Aji, kamu</div>
           </div>
           <div class="online">2 aktif</div>
+          <button class="sound-btn" id="sound-btn" type="button" aria-pressed="true" aria-label="Suara nyala. Tekan untuk mematikan." title="Suara">♪</button>
         </header>
         <div class="chat-feed" id="chat-feed" role="log" aria-live="polite" aria-relevant="additions text">
           <div class="date-divider"><span>Hari ini</span></div>
@@ -252,6 +261,57 @@
       const state = { calledSecurity: false, allyDita: false, proof: false, route: '', answered: false, noReply: false, calledAgain: false };
       const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 
+      const statusEl = document.getElementById('group-status');
+      const statusDefault = statusEl.textContent;
+      const soundBtn = document.getElementById('sound-btn');
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      let soundOn = true;
+      try { soundOn = localStorage.getItem('shiftTerakhirSound') !== 'off'; } catch {}
+      let audioCtx = null;
+      function initAudio() {
+        if (!audioCtx) { try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch {} }
+        if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+      }
+      function tone(freq, dur = .09, gainPeak = .05, type = 'sine', when = 0) {
+        if (!soundOn || !audioCtx) return;
+        const t0 = audioCtx.currentTime + when;
+        const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+        osc.type = type; osc.frequency.setValueAtTime(freq, t0);
+        gain.gain.setValueAtTime(0, t0);
+        gain.gain.linearRampToValueAtTime(gainPeak, t0 + .012);
+        gain.gain.exponentialRampToValueAtTime(.0001, t0 + dur);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(t0); osc.stop(t0 + dur + .05);
+      }
+      function popIn(ghost = false) { tone(ghost ? 392 : 740, .1, .045); if (ghost) tone(370, .12, .03, 'sine', .05); }
+      function sendTick() { tone(1180, .05, .02); }
+      function glitch() {
+        if (!soundOn || !audioCtx) return;
+        const dur = .22; const t0 = audioCtx.currentTime;
+        const buffer = audioCtx.createBuffer(1, Math.floor(audioCtx.sampleRate * dur), audioCtx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / data.length);
+        const src = audioCtx.createBufferSource(); src.buffer = buffer;
+        const filter = audioCtx.createBiquadFilter(); filter.type = 'bandpass'; filter.frequency.value = 900; filter.Q.value = .8;
+        const gain = audioCtx.createGain(); gain.gain.setValueAtTime(.12, t0); gain.gain.exponentialRampToValueAtTime(.0001, t0 + dur);
+        src.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination); src.start(t0);
+        tone(68, .3, .06, 'triangle');
+      }
+      function buzz(pattern) { if (navigator.vibrate) { try { navigator.vibrate(pattern); } catch {} } }
+      function setStatus(text) { statusEl.textContent = text || statusDefault; }
+      function syncSoundBtn() {
+        soundBtn.classList.toggle('off', !soundOn);
+        soundBtn.setAttribute('aria-pressed', String(soundOn));
+        soundBtn.setAttribute('aria-label', soundOn ? 'Suara nyala. Tekan untuk mematikan.' : 'Suara mati. Tekan untuk menyalakan.');
+      }
+      soundBtn.addEventListener('click', () => {
+        soundOn = !soundOn;
+        try { localStorage.setItem('shiftTerakhirSound', soundOn ? 'on' : 'off'); } catch {}
+        syncSoundBtn();
+        if (soundOn) { initAudio(); popIn(false); }
+      });
+      syncSoundBtn();
+
       function scrollFeed() { feed.scrollTop = feed.scrollHeight; }
       function addSystem(text, time='23:51') {
         const node = document.createElement('div');
@@ -270,10 +330,49 @@
         const bubble=document.createElement('div'); bubble.className='bubble'; bubble.textContent=text; content.appendChild(bubble);
         const stamp=document.createElement('div'); stamp.className='stamp'; stamp.textContent=side === 'mine' ? `${time} ✓✓` : time; content.appendChild(stamp);
         row.appendChild(content); feed.appendChild(row); scrollFeed();
+        return row;
+      }
+      function typingRow(line) {
+        const row = document.createElement('div'); row.className = 'msg-row'; row.setAttribute('aria-hidden', 'true');
+        const avatar = document.createElement('div'); avatar.className = 'avatar'; avatar.textContent = line.initials || '??'; row.appendChild(avatar);
+        const content = document.createElement('div'); content.className = 'msg-content';
+        const sender = document.createElement('div'); sender.className = 'sender'; sender.textContent = line.name; content.appendChild(sender);
+        const bubble = document.createElement('div'); bubble.className = 'bubble typing';
+        for (let i = 0; i < 3; i++) { const dot = document.createElement('span'); dot.className = 'tdot'; bubble.appendChild(dot); }
+        content.appendChild(bubble); row.appendChild(content);
+        feed.appendChild(row); scrollFeed();
+        return row;
       }
       async function say(lines) {
-        for (const line of lines) { await wait(260); if (line.system) addSystem(line.text,line.time); else addMessage(line); }
+        for (const line of lines) {
+          if (line.system) { await wait(260); addSystem(line.text, line.time); continue; }
+          const ghost = (line.name || '').startsWith('Aji');
+          setStatus(`${line.name} sedang mengetik…`);
+          const row = typingRow(line);
+          const typeMs = reduceMotion ? 60 : Math.min(2600, Math.max(850, 550 + (line.text || '').length * 24)) * (ghost ? 1.35 : 1);
+          await wait(typeMs);
+          row.remove(); setStatus();
+          addMessage(line);
+          popIn(ghost);
+          if (ghost) buzz(35);
+          await wait(170);
+        }
       }
+      async function ghostRecall() {
+        const line = {name:'Aji · IT', text:'Jangan jawab kalau ada yang manggil nama kamu dari—', time:'23:58', initials:'AJ'};
+        setStatus('Aji · IT sedang mengetik…');
+        const row = typingRow(line);
+        await wait(reduceMotion ? 80 : 2400);
+        row.remove(); setStatus();
+        const msgRow = addMessage(line);
+        popIn(true); buzz([45, 40, 45]);
+        await wait(reduceMotion ? 80 : 1100);
+        const bubble = msgRow.querySelector('.bubble');
+        bubble.classList.add('deleted'); bubble.textContent = 'Pesan ini telah dihapus';
+        glitch(); buzz(90);
+        await wait(500);
+      }
+      function scare() { glitch(); buzz([70, 50, 140]); }
       async function choiceRound(options) {
         choicesWrap.hidden=false;
         choicesEl.replaceChildren();
@@ -285,6 +384,7 @@
           button.addEventListener('click', async () => {
             choicesEl.querySelectorAll('button').forEach(item => item.disabled=true);
             addMessage({text:option.text,time:'23:52',side:'mine'});
+            sendTick();
             await wait(260);
             await option.run();
             choicesWrap.hidden=true;
@@ -309,6 +409,7 @@
         else if (state.route==='stairs' || state.calledSecurity || state.calledAgain || state.allyDita) ending=endings[3];
         else ending=endings[4];
         addSystem('Koneksi grup terputus', '00:00');
+        scare();
         const card=document.createElement('div'); card.className='ending-card';
         const kicker=document.createElement('div'); kicker.className='ending-kicker'; kicker.textContent=ending.kicker;
         const title=document.createElement('h2'); title.className='ending-title'; title.textContent=ending.title;
@@ -342,6 +443,8 @@
         if (state.route==='stairs') await say([{system:true,text:'Speaker lorong berbunyi: “Yang belum mengisi absensi, tetap di tempat.”',time:'23:56'}]);
         else if (state.route==='server') await say([{system:true,text:'Semua monitor menampilkan kolom: NAMA PEGAWAI __________________',time:'23:56'}]);
         else await say([{system:true,text:'Pintu lift terbuka. Di cermin, ada seseorang berdiri tepat di belakangmu.',time:'23:56'}]);
+        scare();
+        await ghostRecall();
         await choiceRound([
           {text:'Jangan jawab. Terus bergerak ke pintu keluar.',run:async()=>{state.noReply=true;await say([{system:true,text:'Kamu menahan napas. Langkah di belakangmu berhenti saat kamu berhenti.',time:'23:57'}]);}},
           {text:'Balas: “Kamu Aji atau bukan?”',run:async()=>{state.answered=true;await say([{name:'Aji · IT',text:'Aku cuma mau kamu masuk daftar.',time:'23:57',initials:'AJ'},{system:true,text:'Pesan terkirim · dibaca oleh 1 perangkat',time:'23:57'}]);}},
@@ -350,7 +453,7 @@
         if (state.proof) addSystem('Salinan log tersimpan lokal. Nama akun pembukanya berubah menjadi: KAMU.', '23:59');
         finishGame();
       }
-      startBtn.addEventListener('click',startGame);
+      startBtn.addEventListener('click', () => { initAudio(); startGame(); });
     })();
   </script>
 </body>
