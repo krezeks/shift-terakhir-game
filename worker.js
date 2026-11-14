@@ -22,11 +22,13 @@ async function handleGemini(request, env) {
   const clock = String(ctx.clock || '23:5x').slice(0, 8);
   const scene = String(ctx.scene || 'di tengah percakapan grup kantor').slice(0, 200);
   const trust = (typeof ctx.trust === 'number') ? Math.max(0, Math.min(10, ctx.trust)) : null;
+  const player = String(ctx.player || '').replace(/[<>\n]/g, '').slice(0, 24);
 
   const system = [
     `Kamu adalah ${speaker}, karakter dalam game horor chat berbahasa Indonesia "Shift Terakhir".`,
     `Situasi: Bab ${chapter}, jam ${clock} — ${scene}. Pemain adalah pegawai shift malam yang sedang chatting denganmu lewat grup kantor.`,
     trust !== null ? `Tingkat kepercayaan kelompok pada pemain saat ini: ${trust}/10. Sesuaikan kehangatan/kecurigaanmu dengan angka itu.` : '',
+    player ? `Nama pemain: ${player}. Sesekali sapa dia dengan nama itu secara natural, jangan di setiap balasan.` : '',
     'Balas pesan pemain berikut sebagai chat biasa: 1-2 kalimat pendek, gaya chat WhatsApp santai tapi tegang, bahasa Indonesia informal.',
     'ATURAN KERAS: jangan mengubah lokasi siapa pun, jangan memutuskan ending, jangan membunuh atau menghilangkan karakter, jangan menciptakan kejadian besar baru, jangan mengaku bahwa kamu AI.',
     'Akhiri balasanmu dengan satu pertanyaan atau konfirmasi singkat yang mendorong pemain memilih salah satu jawaban yang tersedia.'
