@@ -125,7 +125,7 @@
     .tdot:nth-child(3) { animation-delay:.36s; }
     @keyframes tblink { 0%, 60%, 100% { opacity:.25; transform:translateY(0); } 30% { opacity:.95; transform:translateY(-2px); } }
     .bubble.deleted { color:#8d9b94; background:rgba(255,255,255,.03); border-style:dashed; font-style:italic; }
-    .sound-btn { flex:none; width:31px; height:31px; display:grid; place-items:center; border:1px solid var(--line); border-radius:50%; color:#cfe0d2; background:rgba(255,255,255,.03); font-size:14px; line-height:1; cursor:pointer; }
+    .sound-btn { flex:none; width:44px; height:44px; display:grid; place-items:center; border:1px solid var(--line); border-radius:50%; color:#cfe0d2; background:rgba(255,255,255,.03); font-size:14px; line-height:1; cursor:pointer; }
     .sound-btn.off { color:#77837c; text-decoration:line-through; opacity:.6; }
     .bubble.photo { padding:6px; }
     .bubble.photo img { display:block; width:100%; height:auto; border-radius:9px; }
@@ -135,7 +135,7 @@
     @keyframes flick { 50% { opacity:.3; } }
     .chapter-btn { min-height:52px; align-items:flex-start; padding:11px 12px; }
     .chapter-desc { display:block; margin-top:2px; color:#93a29a; font-size:9px; line-height:1.5; }
-    .reset-link { display:block; margin:5px 2px 0; padding:0; border:0; background:none; color:#77837c; font-size:9px; letter-spacing:.06em; cursor:pointer; text-align:left; }
+    .reset-link { display:flex; align-items:center; min-height:44px; margin:5px 2px 0; padding:0; border:0; background:none; color:#77837c; font-size:9px; letter-spacing:.06em; cursor:pointer; text-align:left; }
     .reset-link[hidden] { display:none; }
     .reset-link:hover { color:var(--red); }
     .composer { display:flex; gap:8px; align-items:center; padding:10px 14px 12px; border-top:1px solid var(--line); background:rgba(9,13,16,.72); }
@@ -177,7 +177,7 @@
     .menu-row small { display:block; margin-top:3px; color:#aebbb2; font-size:11px; }
     .menu-chev { margin-left:auto; font-size:24px; color:#8d9b94; }
     .menu-stats { margin-top:22px; color:#93a29a; font-size:11px; letter-spacing:.1em; text-transform:uppercase; }
-    .menu-foot { margin-top:auto; padding-top:30px; color:#68766f; font-size:9px; letter-spacing:.16em; text-transform:uppercase; }
+    .menu-foot { margin-top:auto; padding-top:30px; color:#75847a; font-size:9px; letter-spacing:.16em; text-transform:uppercase; }
     .screen-head { display:flex; gap:14px; align-items:flex-start; }
     .back-btn { width:44px; height:44px; flex:none; border:1px solid var(--line); border-radius:10px; background:rgba(13,19,24,.85); color:var(--text); font-size:18px; cursor:pointer; }
     .screen-kicker { color:var(--red); font-size:10px; font-weight:700; letter-spacing:.3em; }
@@ -185,11 +185,11 @@
     .profile-card { display:flex; gap:14px; align-items:center; margin-top:20px; padding:14px 16px; border:1px solid var(--line); border-radius:14px; background:rgba(13,19,24,.87); }
     .profile-avatar { width:52px; height:52px; flex:none; display:grid; place-items:center; border-radius:50%; border:1px solid var(--line); background:#1a242e; font-size:25px; }
     .profile-info { flex:1; min-width:0; }
-    .profile-role { color:var(--red); font-size:9px; font-weight:700; letter-spacing:.26em; }
-    .profile-name { width:100%; margin-top:3px; padding:2px 0; border:0; border-bottom:1px dashed rgba(221,236,226,.25); background:none; color:var(--text); font:600 16px inherit; }
+    .profile-role { display:block; color:var(--red); font-size:9px; font-weight:700; letter-spacing:.26em; cursor:pointer; }
+    .profile-name { width:100%; min-height:44px; margin-top:3px; padding:2px 0; border:0; border-bottom:1px dashed rgba(221,236,226,.25); background:none; color:var(--text); font:600 16px inherit; }
     .profile-name:focus { outline:none; border-bottom-color:var(--green); }
     .profile-bar { height:5px; margin-top:9px; border-radius:3px; background:rgba(221,236,226,.12); overflow:hidden; }
-    .profile-bar span { display:block; height:100%; width:0; background:linear-gradient(90deg, #ff8277, #c2f278); transition:width .5s; }
+    .profile-bar span { display:block; height:100%; width:0; background:#c2f278; transition:width .5s; }
     .profile-bar-label { margin-top:5px; color:#93a29a; font-size:9px; letter-spacing:.14em; text-transform:uppercase; }
     .warn-note { margin:16px 0 0; padding:10px 14px; border-left:3px solid var(--red); color:#c7d2ca; font-size:12px; line-height:1.65; background:rgba(13,19,24,.62); }
     .warn-note strong { color:var(--red); }
@@ -209,6 +209,10 @@
     .about-body p { margin:0 0 10px; }
     .about-body ul { margin:0; padding-left:18px; }
     .about-body li { margin-bottom:6px; }
+    .menu-row:hover, .chapter-card:hover, .back-btn:hover { border-color:rgba(194,242,120,.38); }
+    .menu-row:active, .chapter-card:active, .back-btn:active { transform:scale(.99); }
+    .chapter-card.locked:hover { border-color:var(--line); }
+    .chapter-card.locked:active { transform:none; }
     @keyframes rise { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
     @media (min-width: 821px) and (max-height: 800px) {
       .page { padding:18px 0 15px; }
@@ -352,19 +356,19 @@
       <div class="profile-card">
         <div class="profile-avatar" id="profile-avatar" aria-hidden="true">K</div>
         <div class="profile-info">
-          <div class="profile-role">PEGAWAI SHIFT MALAM</div>
+          <label class="profile-role" for="profile-name">PEGAWAI SHIFT MALAM</label>
           <input class="profile-name" id="profile-name" type="text" maxlength="24" placeholder="Nama kamu…" aria-label="Nama pemain" autocomplete="off">
           <div class="profile-bar"><span id="profile-bar-fill"></span></div>
           <div class="profile-bar-label" id="profile-bar-label">0 dari 9 ending ditemukan</div>
         </div>
       </div>
-      <p class="warn-note"><strong>PERINGATAN.</strong> Grup ini tidak pernah benar-benar sepi. Apa yang kamu baca di satu bab bisa muncul lagi di bab berikutnya — dan arsipnya mengingat semuanya.</p>
+      <p class="warn-note"><strong>PERINGATAN.</strong> Grup ini tidak pernah benar-benar sepi. Apa yang kamu baca di satu bab bisa muncul lagi di bab berikutnya, dan arsipnya mengingat semuanya.</p>
       <div class="chapter-cards">
         <button class="chapter-card" id="start-btn" type="button">
           <span class="chapter-ghost" aria-hidden="true">01</span>
           <span class="chapter-kicker">DITA · AJI · BIMO</span>
           <span class="chapter-name">SHIFT TERAKHIR</span>
-          <span class="chapter-desc2" id="desc-1">Shift malam di lantai 12 — grup yang seharusnya sudah sepi.</span>
+          <span class="chapter-desc2" id="desc-1">Shift malam di lantai 12: grup yang seharusnya sudah sepi.</span>
           <span class="chapter-status" id="status-1">● SIAP DIMAINKAN</span>
         </button>
         <button class="reset-link" id="reset-1" type="button" hidden>↺ Ulangi Bab 1 dari awal (hapus progres tersimpan)</button>
@@ -372,7 +376,7 @@
           <span class="chapter-ghost" aria-hidden="true">02</span>
           <span class="chapter-kicker">NADIA · DITA · BIMO</span>
           <span class="chapter-name">ARSIP</span>
-          <span class="chapter-desc2" id="desc-2">Seminggu kemudian — arsip chat yang berubah selagi dibaca.</span>
+          <span class="chapter-desc2" id="desc-2">Seminggu kemudian: arsip chat yang berubah selagi dibaca.</span>
           <span class="chapter-status" id="status-2">● SIAP DIMAINKAN</span>
         </button>
         <button class="reset-link" id="reset-2" type="button" hidden>↺ Ulangi Bab 2 dari awal (hapus progres tersimpan)</button>
@@ -390,17 +394,17 @@
     <section class="screen" id="screen-about" hidden>
       <div class="screen-head"><button class="back-btn" type="button" data-back aria-label="Kembali ke menu">←</button><div><div class="screen-kicker">CERITA &amp; CARA MAIN</div><h2 class="screen-title">TENTANG</h2></div></div>
       <div class="about-body">
-        <p>Kamu pegawai shift malam terakhir di lantai 12 Gedung Arunika. Semua orang sudah pulang — tapi grup chat kantor masih aktif, dan salah satu anggotanya seharusnya sudah tap out sejak 22:10.</p>
+        <p>Kamu pegawai shift malam terakhir di lantai 12 Gedung Arunika. Semua orang sudah pulang, tapi grup chat kantor masih aktif, dan salah satu anggotanya seharusnya sudah tap out sejak 22:10.</p>
         <p>Seminggu kemudian, HR memintamu mengekspor arsip grup sebelum migrasi sistem tengah malam. Arsipnya berubah selagi dibaca.</p>
         <h4>Cara bermain</h4>
         <ul>
-          <li><strong>Balasan cepat</strong> — pilih jawaban untuk memajukan cerita.</li>
-          <li><strong>Ketik bebas</strong> — tulis pesanmu sendiri di titik keputusan; karakter akan menjawab (AI Gemini bila aktif, atau balasan lokal). Ketikan yang cocok dengan pilihan akan memajukan cerita; pertanyaan hipotetis tidak dihitung keputusan.</li>
-          <li><strong>Trust (Bab 2)</strong> — keputusanmu mengubah kepercayaan Dita. Ending terbaik butuh bukti <em>dan</em> trust yang cukup.</li>
-          <li><strong>Progres aman</strong> — permainan tersimpan otomatis, bisa dilanjutkan kapan pun, dan tersinkron ke cloud per perangkat.</li>
+          <li><strong>Balasan cepat</strong>: pilih jawaban untuk memajukan cerita.</li>
+          <li><strong>Ketik bebas</strong>: tulis pesanmu sendiri di titik keputusan; karakter akan menjawab (AI Gemini bila aktif, atau balasan lokal). Ketikan yang cocok dengan pilihan akan memajukan cerita; pertanyaan hipotetis tidak dihitung keputusan.</li>
+          <li><strong>Trust (Bab 2)</strong>: keputusanmu mengubah kepercayaan Dita. Ending terbaik butuh bukti <em>dan</em> trust yang cukup.</li>
+          <li><strong>Progres aman</strong>: permainan tersimpan otomatis, bisa dilanjutkan kapan pun, dan tersinkron ke cloud per perangkat.</li>
         </ul>
         <h4>Peringatan</h4>
-        <p>Fiksi horor. Semua tokoh, perusahaan, dan kejadian adalah rekaan. Mengandung suara tiba-tiba dan getaran — earphone disarankan, sendirian tidak.</p>
+        <p>Fiksi horor. Semua tokoh, perusahaan, dan kejadian adalah rekaan. Mengandung suara tiba-tiba dan getaran, earphone disarankan, sendirian tidak.</p>
         <p>Cerita, kode, dan aset dibuat khusus untuk game ini.</p>
       </div>
     </section>
@@ -780,13 +784,13 @@
         scheduleSync();
       }
       function clearSave(ch) { const saves = readSaves(); delete saves[ch]; try { localStorage.setItem(SAVE_KEY, JSON.stringify(saves)); } catch {} refreshChapterButtons(); scheduleSync(); }
-      const DESC_DEFAULT = { 1: 'Shift malam di lantai 12 — grup yang seharusnya sudah sepi.', 2: 'Seminggu kemudian — arsip chat yang berubah selagi dibaca.' };
+      const DESC_DEFAULT = { 1: 'Shift malam di lantai 12: grup yang seharusnya sudah sepi.', 2: 'Seminggu kemudian: arsip chat yang berubah selagi dibaca.' };
       function refreshChapterButtons() {
         const saves = readSaves();
         [1, 2].forEach(n => {
           const has = !!saves[n];
           const desc = document.getElementById('desc-' + n);
-          if (desc) desc.textContent = has ? 'Progres tersimpan — tap untuk melanjutkan dari terakhir.' : DESC_DEFAULT[n];
+          if (desc) desc.textContent = has ? 'Progres tersimpan, tap untuk melanjutkan dari terakhir.' : DESC_DEFAULT[n];
           const rst = document.getElementById('reset-' + n);
           if (rst) rst.hidden = !has;
           const st = document.getElementById('status-' + n);
