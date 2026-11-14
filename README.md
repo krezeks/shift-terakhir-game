@@ -1,6 +1,6 @@
 # Shift Terakhir — Horor Chat Interaktif
 
-Game horor interaktif berbahasa Indonesia. Versi live: [shift-terakhir-game.classic-guitar.workers.dev](https://shift-terakhir-game.classic-guitar.workers.dev).
+Game horor interaktif berbahasa Indonesia. Versi live: [shift-terakhir-game.pangeranet.workers.dev](https://shift-terakhir-game.pangeranet.workers.dev).
 
 ## Mulai mengedit
 
@@ -16,4 +16,6 @@ Tidak perlu instalasi dependency atau proses build untuk versi saat ini.
 
 ## Catatan deployment
 
-Repo ini berisi source yang bisa diedit. Perubahan yang kamu commit di GitHub tidak otomatis mengubah versi live; deployment live yang sudah ada tetap berjalan dan tidak diubah oleh pembuatan repo ini.
+Repo ini terhubung ke Cloudflare Workers Builds (Worker "shift-terakhir-game" di akun Pangeranet): setiap push ke branch `main` otomatis men-deploy versi terbaru ke URL live di atas. Konfigurasi deploy ada di `wrangler.jsonc`.
+
+URL lama `shift-terakhir-game.classic-guitar.workers.dev` berasal dari deployment sementara tanpa login; akunnya tidak bisa diakses lagi dan isinya membeku di versi lama — URL itu tidak lagi diperbarui.
