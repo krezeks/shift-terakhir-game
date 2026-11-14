@@ -11,7 +11,7 @@ Game horor interaktif berbahasa Indonesia dalam format chat grup kantor. Versi l
 
 - **Ketik bebas** — selain tombol balasan, pemain bisa mengetik pesan apa pun di titik keputusan. Ketikan yang cocok dengan pilihan akan memajukan cerita; pertanyaan hipotetis tidak dihitung sebagai keputusan.
 - **Balasan AI (Gemini), opsional** — ketikan bebas dijawab in-character oleh Gemini lewat route `/api/gemini` di `worker.js`. Prompt dipagari: AI tidak boleh mengubah lokasi, memutuskan ending, atau membunuh karakter. API key disimpan sebagai secret `GEMINI_API_KEY` di dashboard Worker — tidak ada key di repo ini. Tanpa key, game otomatis memakai **balasan lokal** (dialog tulisan tangan berbasis kata kunci), jadi game tetap bisa dimainkan penuh.
-- **Resume otomatis** — progres tersimpan di browser pada setiap awal adegan; tutup dan buka lagi untuk melanjutkan dari terakhir. Ada opsi mengulang bab dari awal.
+- **Resume otomatis + sinkron cloud** — progres tersimpan di browser pada setiap awal adegan; tutup dan buka lagi untuk melanjutkan dari terakhir. Progres juga tersinkron ke Cloudflare D1 (`/api/sync`, identitas anonim per perangkat, kunci tersimpan sebagai hash) — versi terbaru menang, dan game tetap jalan lokal penuh saat offline. Ada opsi mengulang bab dari awal.
 - **Pesan foto & pesan suara** di dalam chat, pesan yang terhapus/berubah di depan mata, indikator mengetik per pengirim, suara WebAudio tanpa file audio, getar di HP, dan menu **Setelan** (indikator mengetik, balasan AI, kecepatan teks).
 - Koleksi ending tersimpan per browser.
 

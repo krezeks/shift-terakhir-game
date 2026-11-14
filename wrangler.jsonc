@@ -1,1 +1,1 @@
-{"assets":{"binding":"ASSETS","directory":"."},"compatibility_date":"2026-11-01","main":"worker.js","name":"shift-terakhir-game"}
+{"assets":{"binding":"ASSETS","directory":"."},"compatibility_date":"2026-11-01","d1_databases":[{"binding":"DB","database_id":"5d64045a-37ec-4ba1-aa34-fb82f2ca73e0","database_name":"shift_terakhir_save"}],"main":"worker.js","name":"shift-terakhir-game"}

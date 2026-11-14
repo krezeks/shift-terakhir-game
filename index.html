@@ -652,8 +652,9 @@
         saves[activeChapter] = { seg: segIndex, state: segSnap.state, clock: segSnap.clock, log: segSnap.log };
         try { localStorage.setItem(SAVE_KEY, JSON.stringify(saves)); } catch {}
         refreshChapterButtons();
+        scheduleSync();
       }
-      function clearSave(ch) { const saves = readSaves(); delete saves[ch]; try { localStorage.setItem(SAVE_KEY, JSON.stringify(saves)); } catch {} refreshChapterButtons(); }
+      function clearSave(ch) { const saves = readSaves(); delete saves[ch]; try { localStorage.setItem(SAVE_KEY, JSON.stringify(saves)); } catch {} refreshChapterButtons(); scheduleSync(); }
       const DESC_DEFAULT = { 1: 'Shift malam di lantai 12 — grup yang seharusnya sudah sepi.', 2: 'Seminggu kemudian — arsip chat yang berubah selagi dibaca.' };
       function refreshChapterButtons() {
         const saves = readSaves();
@@ -733,6 +734,56 @@
       setSpeed.addEventListener('change', () => { settings.speed = parseFloat(setSpeed.value) || 1; persistSettings(); });
       [1, 2].forEach(n => { document.getElementById('reset-' + n).addEventListener('click', () => { clearSave(n); }); });
       refreshChapterButtons();
+
+      const CLOUD_KEY = 'shiftTerakhirCloud';
+      const CLOUD_META = 'shiftTerakhirCloudMeta';
+      let syncTimer = null;
+      function cloudIdentity() {
+        try {
+          let c = JSON.parse(localStorage.getItem(CLOUD_KEY) || 'null');
+          if (!c || !c.id || !c.key) {
+            c = { id: crypto.randomUUID(), key: crypto.randomUUID() };
+            localStorage.setItem(CLOUD_KEY, JSON.stringify(c));
+          }
+          return c;
+        } catch { return null; }
+      }
+      function cloudLocalStamp() { const n = Number(localStorage.getItem(CLOUD_META) || 0); return Number.isFinite(n) ? n : 0; }
+      function cloudPayload() {
+        return { v: 1, progress: readSaves(), endings: seenEndings(), updatedAt: cloudLocalStamp() };
+      }
+      function scheduleSync() {
+        try { localStorage.setItem(CLOUD_META, String(Date.now())); } catch {}
+        if (syncTimer) clearTimeout(syncTimer);
+        syncTimer = setTimeout(syncPush, 2000);
+      }
+      async function syncPush() {
+        const c = cloudIdentity();
+        if (!c) return;
+        try {
+          await fetch('/api/sync', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Sync-Id': c.id, 'X-Sync-Key': c.key }, body: JSON.stringify({ save: cloudPayload() }) });
+        } catch {}
+      }
+      async function syncPull() {
+        const c = cloudIdentity();
+        if (!c) return;
+        try {
+          const res = await fetch('/api/sync', { headers: { 'X-Sync-Id': c.id, 'X-Sync-Key': c.key } });
+          if (!res.ok) return;
+          const data = await res.json();
+          if (!data || !data.save || typeof data.save !== 'object') return;
+          const remoteStamp = Number(data.save.updatedAt || data.updatedAt || 0);
+          if (remoteStamp > cloudLocalStamp()) {
+            try {
+              localStorage.setItem(SAVE_KEY, JSON.stringify(data.save.progress || {}));
+              if (Array.isArray(data.save.endings)) localStorage.setItem('shiftTerakhirEndings', JSON.stringify(data.save.endings));
+              localStorage.setItem(CLOUD_META, String(remoteStamp));
+            } catch {}
+            refreshChapterButtons();
+          }
+        } catch {}
+      }
+      syncPull();
       let currentOptions = null;
       let pickCurrent = null;
       async function choiceRound(options) {
